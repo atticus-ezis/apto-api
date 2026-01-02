@@ -38,7 +38,10 @@ SECRET_KEY = env.str(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", default=True)
 
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["0.0.0.0", "localhost", "127.0.0.1"])
+ALLOWED_HOSTS = env.list(
+    "ALLOWED_HOSTS",
+    default=["0.0.0.0", "localhost", "127.0.0.1", "127.0.0.1:8000"],
+)
 
 
 # Application definition
@@ -52,14 +55,30 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     #
     "corsheaders",
-    "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
+    "rest_framework",
+    "dj_rest_auth",
+    "rest_framework.authtoken",
     # django-allauth
     "django.contrib.sites",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "dj_rest_auth.registration",
     # "allauth.socialaccount.providers.google",
 ]
+
+# allauth config
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_EMAIL_VERIFICATION = "optional"
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_ADAPTER = "apto.adapters.CustomAccountAdapter"
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = env.str("HTTP_PROTOCOL", "http")
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+DEFAULT_FROM_EMAIL = "noreply@example.com"
 
 SITE_ID = 1
 
@@ -71,6 +90,8 @@ REST_FRAMEWORK = {
 
 REST_AUTH = {
     "USE_JWT": True,
+    "JWT_AUTH_HTTPONLY": False,
+    # 'USER_DETAILS_SERIALIZER': 'dj_rest_auth.serializers.UserDetailsSerializer',
 }
 
 SIMPLE_JWT = {
@@ -78,6 +99,8 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
 }
 
 MIDDLEWARE = [
@@ -187,6 +210,8 @@ CORS_ALLOWED_ORIGINS = env.list(
 )
 CORS_ALLOW_CREDENTIALS = True
 
+FRONTEND_DOMAIN = env.str("FRONTEND_DOMAIN", default="http://localhost:3000")
+
 
 AUTHENTICATION_BACKENDS = [
     # Needed to login by username in Django admin, regardless of `allauth`
@@ -194,6 +219,9 @@ AUTHENTICATION_BACKENDS = [
     # `allauth` specific authentication methods, such as login by email
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+DEFAULT_FROM_EMAIL = "noreply@example.com"
 
 
 # SOCIALACCOUNT_PROVIDERS = {
