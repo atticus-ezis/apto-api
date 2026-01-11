@@ -30,6 +30,7 @@ from dj_rest_auth.views import (
     PasswordChangeView,
     UserDetailsView,
 )
+from apto.views import GoogleLogin
 from rest_framework_simplejwt.views import TokenVerifyView
 from dj_rest_auth.jwt_auth import get_refresh_view
 
@@ -56,6 +57,7 @@ urlpatterns = [
                                 ResendEmailVerificationView.as_view(),
                                 name="rest_resend_email",
                             ),
+                            path("google/", GoogleLogin.as_view(), name="google_login"),
                         ]
                     ),
                 ),
