@@ -3,47 +3,61 @@ https://github.com/cdcdianne/apato.ph
 
 It uses a Postgresql Database and JWT Authentication.
 
-Initialization:
+# Initialization
 
 - Setup local and production environments: (Environ defaults to .env.local if found)
-- Configure postgresql database: (For prod use Supabase url with dj-database-url, default to local postgres)
+- Configure postgresql database: (For prod use Supabase url with dj-database-url, default to local postgres in dev)
 
-## Authentication
+# Authentication
 
 - Use simpleJWT with Cookies for browser and PWA.
 - Add djangorestframework-simplejwt
 - Add django-allauth and social account integration
-- Use boiler-plate API endpoints from dj-rest
-- Use adapter to over-ride email-links to point to frontend.
-- Explicitly list Default Views.
-
-# Default Behavior (POSTMAN Tested)
-
-- Cookies set on Login and Refresh endpoint.
-- Registration returns tokens (body) - Frontend can redirect to login or auto-login with refresh endpoint.
-- Token Verfity and Refresh - return 200 ok and new tokens (body)
-- Test Flow 1: Register - login - Refresh - Logout
-- Test Flow 2: Reset Password - Resend email - Verify Email - Confirm Pass Reset
-  _Note_
-- Default flow requires user to Login after... Registration, Confirm Email, Confirm Pass Change,
-
-## Customize App Specific Behavior
-
-# Roles and Groups
-
-- Admin / Staff / Tenant / User (public)
+- Use boiler-plate API endpoints from dj-rest-auth
+- Use adapter to over-ride email-links to point to frontend. Used for forgot password and verify email
+- Explicitly list imported views for clarity
 
 # Security
 
 - rate limiting
+- Token rotation + blacklisting
 - use error logging
+- test security sensitive endpoints (pytest)
+
+# Groups
+
+- Owner: Role -> create Staff and/or Tennants (through email links.), Manages Apartments and Staff.
+- Staff: Created by Admin, Role -> can create and manage Tenants of assigned Apartments.
+- Tenant: Created by Admin or Staff, Role -> pays rent and submits maintenance requests to Staff.
+
+- Since multiple Owners will exist, default Admin or superuser cannot be used.
+- Groups are defined programatically for smoother Docker Deployment and Database migrations, In dev: mgmt command, in prod: migration command,
+
+# Permissions
+
+- Permissions are double layered:
+
+1. Global Role Permissions: Tied to Groups. Restricts Model Manipulation. (Only Owner/Staff group can update Apartments). Define Permissions in 'users/groups.py' and set to each Group. Call in Viewset with '[DjangoModelPermissions]'
+2. Object Level Permissions: Tied to views. Restricts Models. (Owner/Staff can only Update Apartments they own). Define in 'app_name/permissions.py'. Call in Viewset below Role Permissions above.
 
 # Apartments
 
-Endpoints (role based access control):
+- Public listing for all visitors (only list view permission)
+- ViewSet for CRUD with Role and Object permissions
 
-- List: Use seperate endpoints (public/, tenant/, manager/) unique views with unique permission classes (Tenant, Admin + Staff, User)
-- CUD: (PRIVATE) Controlled by Admin + Staff
+- Models:
+
+1. Apartment - Details and Owner
+2. StaffManagedApartmments - Staff_id and Apartment_id, necessary to assign Apartments to Staff and enforce Object-level Permissions for Staff group.
+
+- Permissions (Default):
+- Owners: Full control of created Apartments
+- Staff: Update control for Managed Apartments
+
+- Serializer:
+
+1. Apartment - Apartment Details
+2. StaffManagedApartments - Enforce logic -> User must belong to staff group and have matching Owner. (user.created_by == Apartment.owner & user.group.filter('staff').exists())
 
 # Tenant
 

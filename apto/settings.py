@@ -66,6 +66,12 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "dj_rest_auth.registration",
     "allauth.socialaccount.providers.google",
+    # third party apps
+    "django_filters",
+    "djmoney",
+    # apps
+    "apartments",
+    "users",
 ]
 
 # allauth config

@@ -13,4 +13,8 @@ dependencies = [
     "djangorestframework-simplejwt>=5.5.1",
     "django-allauth>=65.13.1",
     "dj-rest-auth[with-social]>=7.0.1",
+    "django-money>=3.5.4",
+    "django-filter>=25.2",
+    "factory-boy>=3.3.3",
+    "pytest-django>=4.11.1",
 ]

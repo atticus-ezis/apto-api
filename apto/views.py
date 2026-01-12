@@ -6,12 +6,22 @@ from apto.settings import env
 
 
 # https://dj-rest-auth.readthedocs.io/en/latest/installation.html#social-authentication-optional
-class GoogleLogin(
-    SocialLoginView
-):  # if you want to use Authorization Code Grant, use this
+
+# Google OAuth2 flow:
+# 1. User clicks "Sign in with Google"
+# https://accounts.google.com/o/oauth2/v2/auth?
+# redirect_uri=<GOOGLE_CALLBACK_URL>&
+# prompt=consent&
+# response_type=code&
+# client_id=<YOUR_CLIENT_ID>&
+# scope=openid%20email%20profile&
+# access_type=offline
+# 2. Google returns code to (callback url) on frontend
+# 3. Frontend then sends code to GoogleLogin view on backend
+# 4. GoogleLogin view on backend returns jwt tokens to frontend
+
+
+class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
     callback_url = env.str("GOOGLE_CALLBACK_URL")
     client_class = OAuth2Client
-
-
-# https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=<CALLBACK_URL_YOU_SET_ON_GOOGLE>&prompt=consent&response_type=code&client_id=<YOUR CLIENT ID>&scope=openid%20email%20profile&access_type=offline
