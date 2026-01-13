@@ -1,40 +1,117 @@
 from django.db import models
+from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 from djmoney.models.fields import MoneyField
-from django.contrib.auth.models import User
+from core.utils import TimeStampedModel
 
 
-# Create your models here.
-class Apartment(models.Model):
+# Index: status
+# unique: address
+class Apartment(TimeStampedModel):
     class StatusChoices(models.TextChoices):
-        AVAILABLE = "AVAILABLE", _("Available")
-        RENTED = "RENTED", _("Rented")
-        SOLD = "SOLD", _("Sold")
+        VACANT = "VACANT", _("Vacant")
+        OCCUPIED = "OCCUPIED", _("Occupied")
+        MAINTENANCE = "MAINTENANCE", _("Maintenance")
         RESERVED = "RESERVED", _("Reserved")
 
-    address = models.CharField(max_length=255)  # maybe one to one
+    # address
+    street_line_1 = models.CharField(max_length=255)
+    street_line_2 = models.CharField(max_length=255, blank=True)
+    unit_number = models.CharField(max_length=100, blank=True)
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    postal_code = models.CharField(max_length=20)
+    country = models.CharField(max_length=2)
+    # details
     bedrooms = models.IntegerField()
     bathrooms = models.IntegerField()
     area = models.IntegerField()
     monthly_rent = MoneyField(max_digits=10, decimal_places=2, default_currency="USD")
-
     status = models.CharField(
-        max_length=255, choices=StatusChoices.choices, default=StatusChoices.AVAILABLE
+        max_length=255, choices=StatusChoices.choices, default=StatusChoices.VACANT
     )
     description = models.CharField(max_length=1000)
+    # relationships
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="owned_apartments",
+    )
 
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    class Meta:
+        indexes = [
+            models.Index(fields=["status"]),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=[
+                    "street_line_1",
+                    "street_line_2",
+                    "unit_number",
+                    "city",
+                    "state",
+                    "postal_code",
+                    "country",
+                ],
+                name="unique_address",
+            )
+        ]
 
     def __str__(self):
-        return self.address
+        # Build address string from components
+        address_parts = [self.street_line_1]
+        if self.unit_number:
+            address_parts.append(f"Unit {self.unit_number}")
+        address_parts.append(self.city)
+        return ", ".join(address_parts)
 
 
-class StaffManagedApartments(models.Model):
-    apartment = models.ForeignKey(Apartment, on_delete=models.CASCADE)
-    staff = models.ForeignKey(User, on_delete=models.CASCADE)
+class StaffManagedApartments(TimeStampedModel):
+    apartment = models.ForeignKey(
+        Apartment, on_delete=models.CASCADE, related_name="staff_assignments"
+    )
+    staff = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="managed_apartments",
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["apartment", "staff"], name="unique_staff_apartment"
+            )
+        ]
 
     def __str__(self):
-        return f"{self.apartment.address} - {self.staff.username}"
+        return f"{self.apartment} - {self.staff.username}"
+
+
+class TenantRentedApartments(TimeStampedModel):
+    apartment = models.ForeignKey(
+        Apartment, on_delete=models.CASCADE, related_name="tenant_rentals"
+    )
+    tenant = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="rented_apartments",
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["apartment", "tenant"], name="unique_tenant_apartment"
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.apartment} - {self.tenant.username}"
+
+
+# TODOS:
+# Applications
+# Payments
+# Maintenance Requests
 
 
 # do this later

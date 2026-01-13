@@ -1,14 +1,18 @@
 from django.urls import path
 from apartments.views import (
-    ApartmentListView,
-    ApartmentDetailView,
-    ApartmentCreateView,
-    ApartmentUpdateView,
+    ApartmentPublicListView,
 )
+from rest_framework.routers import DefaultRouter
+from apartments.views import ApartmentViewSet
+
+apartment_router = DefaultRouter()
+apartment_router.register(r"", ApartmentViewSet, basename="apartment")
 
 urlpatterns = [
-    path("list/", ApartmentListView.as_view(), name="apartment-list"),
-    path("detail/<int:pk>/", ApartmentDetailView.as_view(), name="apartment-detail"),
-    path("create/", ApartmentCreateView.as_view(), name="apartment-create"),
-    path("update/<int:pk>/", ApartmentUpdateView.as_view(), name="apartment-update"),
+    path(
+        "public-listings/",
+        ApartmentPublicListView.as_view(),
+        name="apartment-public-listing",
+    ),
+    *apartment_router.urls,
 ]

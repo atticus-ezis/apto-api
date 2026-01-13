@@ -43,11 +43,11 @@ ALLOWED_HOSTS = env.list(
     default=["0.0.0.0", "localhost", "127.0.0.1", "127.0.0.1:8000"],
 )
 
-
 # Application definition
 
 INSTALLED_APPS = [
     "django.contrib.admin",
+    # custom user
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -102,7 +102,6 @@ REST_AUTH = {
     "JWT_AUTH_COOKIE": "access_token",
     "JWT_AUTH_REFRESH_COOKIE": "refresh_token",
     "JWT_AUTH_SAMESITE": "Lax",
-    # 'USER_DETAILS_SERIALIZER': 'dj_rest_auth.serializers.UserDetailsSerializer',
 }
 
 SIMPLE_JWT = {

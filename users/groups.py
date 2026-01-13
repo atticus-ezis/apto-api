@@ -3,8 +3,9 @@ from rest_framework import permissions
 from django.contrib.contenttypes.models import ContentType
 from apartments.models import Apartment
 
-# Build a management command for dev and a migration command for prod
-owner, _ = Group.objects.get_or_create(name="admin")
+# Run this code deterministically in root app on migration (prod) or Mgmt command (dev)
+
+owner, _ = Group.objects.get_or_create(name="owner")
 staff, _ = Group.objects.get_or_create(name="staff")
 tenant, _ = Group.objects.get_or_create(name="tennant")
 
@@ -29,6 +30,7 @@ staff.permissions.set(
     Permission.objects.filter(
         content_type_in=[apartment_ct],
         codename__in=[
+            "add_apartment",
             "view_apartment",
             "change_apartment",
         ],

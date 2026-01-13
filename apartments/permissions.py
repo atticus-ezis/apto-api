@@ -5,7 +5,7 @@ from apartments.models import StaffManagedApartments
 
 class ApartmentOwnership(BasePermission):
     """
-    Object level permission that checks the CRUD functions only apply to relevant Apartment objects
+    Object level permission that checks CRUD functions apply to relevant Apartment objects
     """
 
     def has_object_permission(self, request, view, obj):

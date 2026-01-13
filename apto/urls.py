@@ -34,59 +34,83 @@ from apto.views import GoogleLogin
 from rest_framework_simplejwt.views import TokenVerifyView
 from dj_rest_auth.jwt_auth import get_refresh_view
 
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("allauth.urls")),
     # dj-rest-auth
     path(
-        "api/auth/",
+        "api/",
         include(
             [
                 path(
-                    "registration/",
+                    "auth/",
                     include(
                         [
-                            path("", RegisterView.as_view(), name="rest_register"),
                             path(
-                                "verify-email/",
-                                VerifyEmailView.as_view(),
-                                name="rest_verify_email",
+                                "registration/",
+                                include(
+                                    [
+                                        path(
+                                            "",
+                                            RegisterView.as_view(),
+                                            name="rest_register",
+                                        ),
+                                        path(
+                                            "verify-email/",
+                                            VerifyEmailView.as_view(),
+                                            name="rest_verify_email",
+                                        ),
+                                        path(
+                                            "resend-email/",
+                                            ResendEmailVerificationView.as_view(),
+                                            name="rest_resend_email",
+                                        ),
+                                        path(
+                                            "google/",
+                                            GoogleLogin.as_view(),
+                                            name="google_login",
+                                        ),
+                                    ]
+                                ),
+                            ),
+                            path("login/", LoginView.as_view(), name="rest_login"),
+                            path("logout/", LogoutView.as_view(), name="rest_logout"),
+                            path(
+                                "password/reset/",
+                                PasswordResetView.as_view(),
+                                name="rest_password_reset",
                             ),
                             path(
-                                "resend-email/",
-                                ResendEmailVerificationView.as_view(),
-                                name="rest_resend_email",
+                                "password/reset/confirm/",
+                                PasswordResetConfirmView.as_view(),
+                                name="rest_password_reset_confirm",
                             ),
-                            path("google/", GoogleLogin.as_view(), name="google_login"),
+                            path(
+                                "password/change/",
+                                PasswordChangeView.as_view(),
+                                name="rest_password_change",
+                            ),
+                            path(
+                                "user/",
+                                UserDetailsView.as_view(),
+                                name="rest_user_details",
+                            ),
+                            path(
+                                "token/verify/",
+                                TokenVerifyView.as_view(),
+                                name="token_verify",
+                            ),
+                            path(
+                                "token/refresh/",
+                                get_refresh_view().as_view(),
+                                name="token_refresh",
+                            ),
                         ]
                     ),
                 ),
-                path("login/", LoginView.as_view(), name="rest_login"),
-                path("logout/", LogoutView.as_view(), name="rest_logout"),
-                path(
-                    "password/reset/",
-                    PasswordResetView.as_view(),
-                    name="rest_password_reset",
-                ),
-                path(
-                    "password/reset/confirm/",
-                    PasswordResetConfirmView.as_view(),
-                    name="rest_password_reset_confirm",
-                ),
-                path(
-                    "password/change/",
-                    PasswordChangeView.as_view(),
-                    name="rest_password_change",
-                ),
-                path("user/", UserDetailsView.as_view(), name="rest_user_details"),
-                path("token/verify/", TokenVerifyView.as_view(), name="token_verify"),
-                path(
-                    "token/refresh/", get_refresh_view().as_view(), name="token_refresh"
-                ),
+                path("apartments/", include("apartments.urls")),
             ]
         ),
     ),
-    path("api/apartments/", include("apartments.urls")),
-    # path("api/auth/", include("dj_rest_auth.urls")),
-    # path("api/auth/registration/", include("dj_rest_auth.registration.urls")),
 ]

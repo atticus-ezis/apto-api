@@ -193,7 +193,6 @@ dependencies = [
     { name = "django-environ" },
     { name = "django-filter" },
     { name = "django-money" },
-    { name = "django-pytest" },
     { name = "djangorestframework-simplejwt" },
     { name = "factory-boy" },
     { name = "psycopg" },
@@ -210,7 +209,6 @@ requires-dist = [
     { name = "django-environ", specifier = ">=0.11.0" },
     { name = "django-filter", specifier = ">=25.2" },
     { name = "django-money", specifier = ">=3.5.4" },
-    { name = "django-pytest", specifier = ">=0.2.0" },
     { name = "djangorestframework-simplejwt", specifier = ">=5.5.1" },
     { name = "factory-boy", specifier = ">=3.3.3" },
     { name = "psycopg", specifier = ">=3.1.0" },
@@ -325,12 +323,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/4b/7c/b3c5154e1927a7423
 wheels = [
     { url = "https://files.pythonhosted.org/packages/42/12/5fc531d267d8a8add794985b60c1ec0b6516eab1b4907ec9d82f1076ea0c/django_money-3.5.4-py3-none-any.whl", hash = "sha256:628b3afb6671edc2cbd26743d858c31d3b99a735357f7acb6a399ab3ab008d2b", size = 36085, upload-time = "2025-04-17T10:22:54.58Z" },
 ]
-
-[[package]]
-name = "django-pytest"
-version = "0.2.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/b2/e2/2a87105042c08a6f116aac1d9c666e89982a4f707652a0f7d76e8a88b554/django-pytest-0.2.0.tar.gz", hash = "sha256:de21f20f9e7eb941529d75078b18192506a9f6d4ae80f86fbe2f3bcac8e09d71", size = 5906, upload-time = "2012-03-28T21:26:17.372Z" }
 
 [[package]]
 name = "djangorestframework"

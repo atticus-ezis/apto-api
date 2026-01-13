@@ -12,11 +12,21 @@ class ApartmentSerializer(serializers.ModelSerializer):
         model = Apartment
         fields = [
             "id",
-            "address",
+            "street_line_1",
+            "street_line_2",
+            "unit_number",
+            "city",
+            "state",
+            "postal_code",
+            "country",
             "bedrooms",
             "bathrooms",
             "area",
             "monthly_rent",
             "status",
             "description",
+            "owner",
+            "created_at",
+            "updated_at",
         ]
+        read_only_fields = ["owner", "created_at", "updated_at"]
