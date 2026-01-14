@@ -5,9 +5,6 @@ from users.tests.factory import UserFactory
 
 
 class ApartmentFactory(DjangoModelFactory):
-    class Meta:
-        model = Apartment
-
     # Address fields
     street_line_1 = factory.Faker("street_address")
     street_line_2 = factory.Faker("secondary_address")
@@ -27,3 +24,8 @@ class ApartmentFactory(DjangoModelFactory):
 
     # Relationships
     owner = factory.SubFactory(UserFactory)
+
+    # add staff and tenants in test
+
+    class Meta:
+        model = Apartment

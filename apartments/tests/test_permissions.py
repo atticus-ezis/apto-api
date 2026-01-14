@@ -1,16 +1,14 @@
-import pytest
 from django.urls import reverse
 from apartments.tests.factory import ApartmentFactory
-from apartments.models import StaffManagedApartments
 from apartments.models import Apartment
+from users.tests.factory import UserFactory
 
 
-# relies on permissions being set via migrations or management command
-@pytest.mark.django_db
+# relies on group creation in management command
+
+
 class TestApartmentPermissions:
-    def test_create_restricted_to_owner(
-        self, api_client, owner_user, staff_user, tenant_user
-    ):
+    def test_create_restricted_to_owner(self, api_client, owner_user, tenant_user):
         create_url = reverse("apartment-list")
         data = {
             "street_line_1": "123 Test St",
@@ -47,12 +45,19 @@ class TestApartmentPermissions:
         assert apartment is not None
         assert apartment.owner == owner_user
 
+        plain_user = UserFactory()
+        api_client.force_authenticate(user=plain_user)
+        response = api_client.post(create_url, data)
+        assert response.status_code == 403, (
+            "Plain user should not be able to create an apartment"
+        )
+
     def test_update_restricted_to_owner_and_staff(
         self, api_client, owner_user, staff_user, tenant_user
     ):
         apartment = ApartmentFactory(owner=owner_user)
         # Create StaffManagedApartments relationship so staff can update
-        StaffManagedApartments.objects.create(apartment=apartment, staff=staff_user)
+        apartment.staff.add(staff_user)
 
         update_url = reverse("apartment-detail", kwargs={"pk": apartment.pk})
         data = {"street_line_1": "456 Updated St"}
@@ -98,9 +103,55 @@ class TestApartmentPermissions:
             "Staff should not be able to delete an apartment"
         )
 
+        apartment.staff.add(staff_user)
+        response = api_client.delete(delete_url)
+        assert response.status_code == 403, (
+            "Staff should not be able to delete an apartment. Even if assigned to it."
+        )
+
         # Owner should succeed
         api_client.force_authenticate(user=owner_user)
         response = api_client.delete(delete_url)
         assert response.status_code == 204, (
             "Owner should be able to delete an apartment"
+        )
+
+    def test_list_restrictions(self, api_client, owner_user, staff_user, tenant_user):
+        mgmt_apartment = ApartmentFactory(owner=owner_user)
+        public_apartment = ApartmentFactory()
+
+        assert Apartment.objects.count() == 2, (
+            "There should be 2 apartments in the database"
+        )
+
+        mgmt_apartment.staff.add(staff_user)
+        mgmt_apartment.tenants.add(tenant_user)
+
+        list_url = reverse("apartment-list")
+
+        api_client.force_authenticate(user=owner_user)
+        owner_response = api_client.get(list_url)
+        assert owner_response.data[0]["id"] == mgmt_apartment.pk, (
+            "owner doesn't see their own apartment"
+        )
+        assert len(owner_response.data) == 1, (
+            "Owner sees other apartments they are not managing"
+        )
+
+        api_client.force_authenticate(user=staff_user)
+        staff_response = api_client.get(list_url)
+        assert staff_response.data[0]["id"] == mgmt_apartment.pk, (
+            "Staff doesn't see their own apartment"
+        )
+        assert len(staff_response.data) == 1, (
+            "Staff sees other apartments they are not managing"
+        )
+
+        api_client.force_authenticate(user=tenant_user)
+        tenant_response = api_client.get(list_url)
+        assert tenant_response.data[0]["id"] == mgmt_apartment.pk, (
+            "Tenant doesn't see their own apartment"
+        )
+        assert len(tenant_response.data) == 1, (
+            "Tenant sees other apartments they are not renting"
         )

@@ -37,6 +37,14 @@ class Apartment(TimeStampedModel):
         on_delete=models.CASCADE,
         related_name="owned_apartments",
     )
+    staff = models.ManyToManyField(
+        User,
+        related_name="managing_apartments",
+    )
+    tenants = models.ManyToManyField(
+        User,
+        related_name="renting_apartments",
+    )
 
     class Meta:
         indexes = [
@@ -64,57 +72,3 @@ class Apartment(TimeStampedModel):
             address_parts.append(f"Unit {self.unit_number}")
         address_parts.append(self.city)
         return ", ".join(address_parts)
-
-
-class StaffManagedApartments(TimeStampedModel):
-    apartment = models.ForeignKey(
-        Apartment, on_delete=models.CASCADE, related_name="staff_assignments"
-    )
-    staff = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="managed_apartments",
-    )
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["apartment", "staff"], name="unique_staff_apartment"
-            )
-        ]
-
-    def __str__(self):
-        return f"{self.apartment} - {self.staff.username}"
-
-
-class TenantRentedApartments(TimeStampedModel):
-    apartment = models.ForeignKey(
-        Apartment, on_delete=models.CASCADE, related_name="tenant_rentals"
-    )
-    tenant = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="rented_apartments",
-    )
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["apartment", "tenant"], name="unique_tenant_apartment"
-            )
-        ]
-
-    def __str__(self):
-        return f"{self.apartment} - {self.tenant.username}"
-
-
-# TODOS:
-# Applications
-# Payments
-# Maintenance Requests
-
-
-# do this later
-# class ApartmentImage(models.Model):
-#     apartment = models.ForeignKey(Apartment, on_delete=models.CASCADE)
-#     image = models.ImageField(upload_to="apartments/")

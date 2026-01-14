@@ -20,16 +20,28 @@ class ApartmentPublicListView(generics.ListAPIView):
 class ApartmentViewSet(viewsets.ModelViewSet):
     permission_classes = [DjangoModelPermissions, IsAuthenticated, ApartmentOwnership]
     serializer_class = ApartmentSerializer
+    search_fields = [
+        "street_line_1",
+        "street_line_2",
+        "unit_number",
+        "city",
+        "state",
+        "postal_code",
+        "country",
+    ]
+    # filter field for status
+    ordering_fields = ["created_at"]
+    ordering = ["-created_at"]
 
     def get_queryset(self):
         user = self.request.user
         if user.groups.filter(name="owner").exists():
             return Apartment.objects.filter(owner=user)
         elif user.groups.filter(name="staff").exists():
-            return Apartment.objects.filter(staff_assignments__staff=user).distinct()
+            return Apartment.objects.filter(staff=user).distinct()
 
         elif user.groups.filter(name="tenant").exists():
-            return Apartment.objects.filter(tenant_rentals__tenant=user).distinct()
+            return Apartment.objects.filter(tenants=user).distinct()
         else:
             return Apartment.objects.none()
 

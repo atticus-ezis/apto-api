@@ -13,18 +13,3 @@ class UserFactory(DjangoModelFactory):
     username = factory.Sequence(lambda n: f"user_{n}")
     email = factory.LazyAttribute(lambda obj: f"{obj.username}@example.com")
     password = factory.PostGenerationMethodCall("set_password", "password")
-
-    def create_owner(self):
-        group, _ = Group.objects.get_or_create(name="owner")
-        self.groups.add(group)
-        return self
-
-    def create_staff(self):
-        group, _ = Group.objects.get_or_create(name="staff")
-        self.groups.add(group)
-        return self
-
-    def create_tenant(self):
-        group, _ = Group.objects.get_or_create(name="tenant")
-        self.groups.add(group)
-        return self
