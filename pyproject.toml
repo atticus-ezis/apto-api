@@ -17,4 +17,5 @@ dependencies = [
     "django-filter>=25.2",
     "factory-boy>=3.3.3",
     "pytest-django>=4.11.1",
+    "drf-spectacular>=0.29.0",
 ]

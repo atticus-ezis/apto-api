@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     # third party apps
     "django_filters",
     "djmoney",
+    "drf_spectacular",
     # apps
     "apartments",
     "users",
@@ -92,7 +93,14 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "dj_rest_auth.jwt_auth.JWTCookieAuthentication",
         # "rest_framework_simplejwt.authentication.JWTAuthentication",
-    )
+    ),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Apartment Management API",
+    "DESCRIPTION": "API for Dayana",
+    "VERSION": "1.0.0",
 }
 
 REST_AUTH = {

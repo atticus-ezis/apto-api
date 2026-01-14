@@ -33,6 +33,7 @@ from dj_rest_auth.views import (
 from apto.views import GoogleLogin
 from rest_framework_simplejwt.views import TokenVerifyView
 from dj_rest_auth.jwt_auth import get_refresh_view
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 
 urlpatterns = [
@@ -110,6 +111,12 @@ urlpatterns = [
                     ),
                 ),
                 path("apartments/", include("apartments.urls")),
+                path("docs/schema/", SpectacularAPIView.as_view(), name="schema"),
+                path(
+                    "docs/",
+                    SpectacularSwaggerView.as_view(url_name="schema"),
+                    name="swagger-ui",
+                ),
             ]
         ),
     ),
