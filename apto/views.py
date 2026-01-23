@@ -23,5 +23,7 @@ from apto.settings import env
 
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
-    callback_url = env.str("GOOGLE_CALLBACK_URL")
+    callback_url = env.str(
+        "GOOGLE_CALLBACK_URL", "http://localhost:3000/auth/google/callback"
+    )
     client_class = OAuth2Client

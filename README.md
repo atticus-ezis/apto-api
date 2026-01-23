@@ -1,6 +1,11 @@
 This is the Backend for Dayana's Apartment Management App.
 https://github.com/cdcdianne/apato.ph
 
+# Setuo
+
+Install these first: uv, libpq, Docker (Desktop App)
+Navigate to directory with manage.py -> uv sync -> source .venv/bin/activate -> docker-compose build -d -> docker compose up -d -> visit documentation at http://0.0.0.0:8000/api/docs
+
 It uses a Postgresql Database and JWT Authentication.
 
 # Initialization

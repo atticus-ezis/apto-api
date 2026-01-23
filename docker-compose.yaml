@@ -1,0 +1,54 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: dayana_apto_db
+    environment:
+      DB_HOST: db
+      POSTGRES_DB: apto
+      POSTGRES_USER: postgres_user
+      POSTGRES_PASSWORD: postgres_password
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - dayana_apto_network
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dayana_apto_web
+    # override sDockerfile CMD
+    command: >
+      sh -c "
+      python manage.py migrate &&
+      python manage.py setup_groups --reset &&
+      python manage.py runserver 0.0.0.0:8000
+      "
+    volumes:
+      - .:/app
+      - /app/.venv
+    ports:
+      - "${WEB_PORT:-8000}:8000"
+    environment:
+      DB_HOST: db
+      POSTGRES_DB: apto
+      POSTGRES_USER: postgres_user
+      POSTGRES_PASSWORD: postgres_password
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - dayana_apto_network
+
+volumes:
+  postgres_data:
+
+networks:
+  dayana_apto_network:
+    driver: bridge

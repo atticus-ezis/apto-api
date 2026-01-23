@@ -40,9 +40,20 @@ DEBUG = env.bool("DEBUG", default=True)
 
 ALLOWED_HOSTS = env.list(
     "ALLOWED_HOSTS",
-    default=["0.0.0.0", "localhost", "127.0.0.1", "127.0.0.1:8000"],
+    default=[
+        "0.0.0.0",
+        "localhost",
+        "127.0.0.1",
+        "127.0.0.1:8000",
+    ],
 )
 
+CSRF_TRUSTED_ORIGINS = env.list(
+    "CSRF_TRUSTED_ORIGINS",
+    default=[
+        "https://w0lc0hs7-8000.asse.devtunnels.ms",
+    ],
+)
 # Application definition
 
 INSTALLED_APPS = [
@@ -171,9 +182,9 @@ else:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": env.str("POSTGRES_DB", default="resume_builder"),
-            "USER": env.str("POSTGRES_USER", default="postgres"),
-            "PASSWORD": env.str("POSTGRES_PASSWORD", default="postgres"),
+            "NAME": env.str("POSTGRES_DB", default="apto"),
+            "USER": env.str("POSTGRES_USER", default="postgres_user"),
+            "PASSWORD": env.str("POSTGRES_PASSWORD", default="postgres_password"),
             "HOST": env.str("DB_HOST", default="127.0.0.1"),
             "PORT": env.str("DB_PORT", default="5432"),
         }
