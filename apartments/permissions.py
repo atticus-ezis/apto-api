@@ -14,5 +14,7 @@ class ApartmentOwnership(BasePermission):
             return obj.owner_id == user.id  # faster than obj.owner == user
         elif user.groups.filter(name="staff").exists():
             return obj.staff.filter(id=user.id).exists()
+        elif user.groups.filter(name="tenant").exists():
+            return obj.tenants.filter(id=user.id).exists()
         else:
             return False

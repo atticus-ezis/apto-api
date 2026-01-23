@@ -18,9 +18,11 @@ class ApartmentFactory(DjangoModelFactory):
     bedrooms = factory.Faker("random_int", min=1, max=5)
     bathrooms = factory.Faker("random_int", min=1, max=3)
     area = factory.Faker("random_int", min=50, max=200)
-    monthly_rent = 1500.00
-    status = Apartment.StatusChoices.VACANT
-    description = factory.Faker("paragraph")
+    monthly_rent = factory.Faker("random_int", min=700, max=6000)
+    status = factory.Faker("random_element", elements=Apartment.StatusChoices.values)
+    description = factory.Faker(
+        f"{street_line_1}, {bedrooms} bedroom, {bathrooms} bathroom, {area} sqft"
+    )
 
     # Relationships
     owner = factory.SubFactory(UserFactory)

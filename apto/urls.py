@@ -31,6 +31,7 @@ from dj_rest_auth.views import (
     UserDetailsView,
 )
 from apto.views import GoogleLogin
+from users.views import VerifyUserView
 from rest_framework_simplejwt.views import TokenVerifyView
 from dj_rest_auth.jwt_auth import get_refresh_view
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
@@ -48,6 +49,11 @@ urlpatterns = [
                     "auth/",
                     include(
                         [
+                            path(
+                                "verify-user/",
+                                VerifyUserView.as_view(),
+                                name="verify_user",
+                            ),
                             path(
                                 "registration/",
                                 include(
